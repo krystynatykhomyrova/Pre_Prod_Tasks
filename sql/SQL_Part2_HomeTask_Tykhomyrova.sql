@@ -5,6 +5,7 @@
 select *
 into NewShippers
 from Shippers
+--query to verify that the table was created
 select *
 from NewShippers
 --2 Find the set of products (Product Name) and maximum value of units in stock for each one, which is in the range from 25 to 50. 
@@ -33,7 +34,7 @@ from Customers
 except
 select country
 from Employees
--- or
+-- or find the list of different countries in  Customers and Employees tables
 select country
 from Employees
 except
@@ -50,19 +51,21 @@ select MAX (Region) as Region
 from Employees
 where Title like '%Sales%'
 --7 Get two lists of products: with a price < 50.00 with a discountinued flag and < 50  without a discountinued flag.
+--first list (with discontinued flag its more then 1 in column "discontinued")
 select UnitPrice, Discontinued
 from Products
 where UnitPrice <'50' and Discontinued > 0
-Union
+--second list (without discontinued flag its 0 in column "discontinued")
 select UnitPrice, Discontinued
 from Products
 where UnitPrice <'50' and Discontinued = 0
---8 Create new table NewProducts based on the Products table with only discountinued products. Compare data sets between Products and NewProducts tables. 
+--8 Create new table NewProducts based on the Products table with only discountinued products. Compare data sets between Products and NewProducts tables.
+--(with discontinued flag its more then 1 in column "discontinued") 
 select *
 into NewProducts
 from Products
 where Discontinued > 0
-
+--query to verify that the table was created
 select *
 from NewProducts
 --(Check that only discountinued products are inserted)
