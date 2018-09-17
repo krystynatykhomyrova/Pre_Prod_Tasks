@@ -179,7 +179,7 @@ db.universities.insertMany([
 //b.	Select university without coordinates. Show only Address information. 
  db.universities.find ({ 'address.coordinates': { $exists: false} },{address:1, _id:0})
 //c.	Select university with State = “MA” and zipcode not equal to “27897”. Show id, name, state, zipcode 
- db.universities.find ({"address.zipcode": { $ne: "27897"},"address.state": "MA" }, {  name:1, "adress.zipcode":1,"address.state":1})
+ db.universities.find ({"address.zipcode": { $ne: "27897"},"address.state": "MA" }, {  name:1, "address.zipcode":1,"address.state":1})
 //d.	Select users with Date of Birth more than (>) 1980 year and less than current date. Show only Date of Birth 
  db.users.find({DateOfBirth:{$gt: ISODate("1980-12-31 00:00:00[.000]"), $lt: new Date()}}, {_id:0, DateOfBirth:1}) 
 //e.	Change course name and delete all other information (university_id, users) for course, which contains only students.
@@ -192,22 +192,30 @@ db.courses.update( {"users.role":{$ne: "instructor"}}, {$unset:{university_id: 1
 db.courses.find({"users.role":{$ne: "instructor"}}, {name:1, "users.role":1})
 //f.	Select courses with max number of users. Show course name, user roles, amount of users. 
 db.courses.find({}, {name:1, "users.roles":1}).sort({"users":-1}).limit(1),({name:1,"users.role":1})
-//g.	*Select user with the longest MiddleName. Show _id, MiddleName, length. 
+//g.	*Select user with the longest MiddleName. Show _id, MiddleName, length. 
+//since this is a job with "*", I did it not completely.
 db.users.find({}, {MiddleName:1}).sort({"MiddleName":-1}).limit(1)
-//h.	Update only the course name, which contains every user role. 
-db.courses.update({"users.role":"instructor"}, {$set:{name:"CoursF2"}},{multi: true})
-//Query to verify the completion of the assignment
+//h.	Update only the course name, which contains every user role. 
+//to learn all the roles we use distinct
+db.courses.distinct('users.role')
+//having learned all the roles, we can fit them in the query
+db.courses.update({"users.role":["instructor","student","admin"]}, {$set:{name:"CoursF2"}},{multi: true})
+//Query to verify the completion of the assignment
 db.courses.find({"users.role":"instructor" })
-//i.	Replace User document with Name = “Pavel” (insert your values and pay attention for the new structure. 
+//i.	Replace User document with Name = “Pavel” (insert your values and pay attention for the new structure. 
 //Use .find() before replacement and compare values after)
 db.users.update( {"FirstName":"Pavel"}, {$set:{FirstName: "Ihor", LastName: "Ihorev", MiddleName: "Ihorevich", DateOfBirth: "1990-01-01 01:00:00.000Z"}},{multi: true})
-//Query to verify that such a user does not exist
-db.users.find({"FirstName":"Pavel"})
-//And query to verify the completion of the assignment
-db.users.find({"FirstName":"Ihor"})
-//j.	Delete user which has only LastName by 2 ways 
-//(use delete()and remove() commands)(i.e. MiddleName, Date of Birth, First Name are null).
+//Query to verify that such a user does not exist
+db.users.find({"FirstName":"Pavel"})
+//And query to verify the completion of the assignment
+db.users.find({"FirstName":"Ihor"})
+//j.	Delete user which has only LastName by 2 ways 
+//(use delete()and remove() commands)(i.e. MiddleName, Date of Birth, First Name are null).
 //I used a remove 
 db.users.remove({MiddleName: null, DateOfBirth: null, FirstName: null}, {multi: true})
 //Query to verify that such a user does not exist
-db.users.find({MiddleName: null, DateOfBirth: null, FirstName: null})
+db.users.find({MiddleName: null, DateOfBirth: null, FirstName: null})
+
+
+
+
